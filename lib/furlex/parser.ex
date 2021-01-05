@@ -14,7 +14,7 @@ defmodule Furlex.Parser do
   def extract(tags, html, match) when is_list(tags) do
     tags
     |> Stream.map(&extract(&1, html, match))
-    |> Enum.reject(fn {_, v} -> is_nil(v) end)
+    |> Stream.reject(fn {_, v} -> is_nil(v) end)
     |> Map.new()
     |> group_keys()
   end

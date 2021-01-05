@@ -77,7 +77,7 @@ defmodule Furlex do
     parse = &Task.async(&1, :parse, [ body ])
     tasks = Enum.map([Twitter, JsonLD], parse)
 
-    with [ facebook, twitter, json_ld, other ] <- Task.yield_many(tasks),
+    with [ twitter, json_ld ] <- Task.yield_many(tasks),
          {_twitter,  {:ok, {:ok, twitter}}}    <- twitter,
          {_json_ld,  {:ok, {:ok, json_ld}}}    <- json_ld
     do
@@ -87,7 +87,7 @@ defmodule Furlex do
       }}
     else
       e ->
-        IO.inspect(label: :error)
+        IO.inspect(e, label: :error)
         {:error, :parse_error}
     end
   end
