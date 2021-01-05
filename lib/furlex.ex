@@ -9,16 +9,15 @@ defmodule Furlex do
   use Application
 
   alias Furlex.{Fetcher, Parser}
-  alias Furlex.Parser.{Facebook, HTML, JsonLD, Twitter}
+  alias Furlex.Parser.{HTML, JsonLD, Twitter}
 
   defstruct [
-    :canonical_url, :oembed, :facebook, :twitter, :json_ld, :other, :status_code
+    :canonical_url, :oembed, :twitter, :json_ld, :other, :status_code
   ]
 
   @type t :: %__MODULE__{
     canonical_url: String.t,
     oembed: nil | Map.t,
-    facebook: Map.t,
     twitter: Map.t,
     json_ld: List.t,
     other: Map.t,
@@ -53,10 +52,8 @@ defmodule Furlex do
       {:ok, %__MODULE__{
         canonical_url: Parser.extract_canonical(body),
         oembed: oembed,
-        facebook: results.facebook,
         twitter: results.twitter,
         json_ld: results.json_ld,
-        other: results.other,
         status_code: status_code,
       }}
     end
@@ -79,19 +76,15 @@ defmodule Furlex do
 
   defp parse(body) do
     parse = &Task.async(&1, :parse, [ body ])
-    tasks = Enum.map([Facebook, Twitter, JsonLD, HTML], parse)
+    tasks = Enum.map([Twitter, JsonLD], parse)
 
     with [ facebook, twitter, json_ld, other ] <- Task.yield_many(tasks),
-         {_facebook, {:ok, {:ok, facebook}}}   <- facebook,
          {_twitter,  {:ok, {:ok, twitter}}}    <- twitter,
-         {_json_ld,  {:ok, {:ok, json_ld}}}    <- json_ld,
-         {_other,    {:ok, {:ok, other}}}      <- other
+         {_json_ld,  {:ok, {:ok, json_ld}}}    <- json_ld
     do
       {:ok, %{
-        facebook: facebook,
         twitter: twitter,
         json_ld: json_ld,
-        other: other
       }}
     else
       _ -> {:error, :parse_error}
