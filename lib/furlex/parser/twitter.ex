@@ -14,7 +14,6 @@ defmodule Furlex.Parser.Twitter do
     map  = Parser.extract tags(), html, meta
 
     {:ok, map}
-    |> IO.inspect(label: :twitter_map)
   end
 
   @doc false

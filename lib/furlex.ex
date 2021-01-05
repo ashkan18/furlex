@@ -9,10 +9,10 @@ defmodule Furlex do
   use Application
 
   alias Furlex.{Fetcher, Parser}
-  alias Furlex.Parser.{HTML, JsonLD, Twitter}
+  alias Furlex.Parser.{JsonLD, Twitter}
 
   defstruct [
-    :canonical_url, :oembed, :twitter, :json_ld, :other, :status_code
+    :canonical_url, :oembed, :twitter, :json_ld, :status_code
   ]
 
   @type t :: %__MODULE__{
@@ -20,7 +20,6 @@ defmodule Furlex do
     oembed: nil | Map.t,
     twitter: Map.t,
     json_ld: List.t,
-    other: Map.t,
     status_code: Integer.t,
   }
 
@@ -87,7 +86,9 @@ defmodule Furlex do
         json_ld: json_ld,
       }}
     else
-      _ -> {:error, :parse_error}
+      e ->
+        IO.inspect(label: :error)
+        {:error, :parse_error}
     end
   end
 end
